@@ -1,0 +1,26 @@
+.polygon {
+  stroke: #CCC !important;
+  stroke-width: .5 !important;
+  fill: #333 !important;
+}
+
+.react-d3-map-mobile__extent {
+  fill: #933 !important;
+  opacity: .6 !important;
+}
+
+.react-d3-map-mobile__mercator_controller__polygon_group {
+  fill: blue !important;
+  opacity: .4 !important;
+}
+
+.react-d3-map-mobile__mercator_controller__line_group {
+  fill: blue !important;
+  opacity: .4 !important;
+}
+
+.react-d3-map-mobile__mercator_controller__point_group {
+  fill: blue !important;
+  opacity: .4 !important;
+  stroke-width: 1 !important;
+}
