@@ -15,6 +15,16 @@ export default class MercatorControllerMap extends Component {
     super(props);
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextProps.scale
+      !== this.props.scale) {
+      return false;
+    }else {
+      return true;
+    }
+  }
+
+
   render() {
 
     const {

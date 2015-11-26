@@ -6,6 +6,12 @@ import {
   PropTypes
 } from 'react'
 
+import d3 from 'd3';
+
+import {
+  default as ReactDOM
+} from 'react-dom'
+
 import {
   Chart,
   Polygon,
@@ -21,39 +27,60 @@ import {
 export default class MercatorController extends Component {
   constructor(props) {
     super(props);
+  }
 
-    this.state = {
-      zoomTranslate: null,
-      zoomScale: null
+  shouldComponentUpdate(nextProps, nextState) {
+    if(nextProps.center
+      !== this.props.center) {
+      return false;
+    }else {
+      return true;
     }
   }
 
-  onZoom(zoomScale, zoomTranslate) {
-    this.setState({
-      zoomTranslate: zoomTranslate,
-      zoomScale: zoomScale
-    })
+  componentDidMount() {
+    const {
+      cWidth,
+      dragExtent,
+      controllerCenter
+    } = this.props
+
+    var extent = ReactDOM.findDOMNode(this.refs.extent);
+    var that = this;
+    var newPosition = [0, 0];
+
+    var drag = d3.behavior.drag()
+      .on("drag", function(d,i) {
+        var evt = d3.event;
+
+        d3.select(this)
+          .attr("transform", function(){
+            newPosition[0] += evt.dx;
+            newPosition[1] += evt.dy;
+            return "translate(" + newPosition[0] + ',' + newPosition[1] + ")"
+          })
+
+        console.log(controllerCenter)
+        var centerPx = that.proj(controllerCenter)
+        var pos = that.proj.invert([centerPx[0] + newPosition[0], centerPx[1] + newPosition[1]])
+        // sent the center coordinates to the map
+        dragExtent(pos[0], pos[1])
+      });
+
+    d3.select(extent)
+      .call(drag);
   }
 
   render() {
 
     const {
-      zoomTranslate,
-      zoomScale
-    } = this.state;
-
-    const {
       mapDim,
       controllerScale,
       controllerCenter,
-      width,
+      cWidth,
+      cHeight,
       projection
     } = this.props;
-
-    // controller height and width
-    var cHeight = 150;
-    var cWidth = width / 3;
-    var onZoom = this.onZoom.bind(this);
 
     var scale = controllerScale / 2 / Math.PI;
     var translate = [cWidth / 2, cHeight / 2];
@@ -61,10 +88,12 @@ export default class MercatorController extends Component {
 
     var proj = projectionFunc({
       projection: 'mercator',
-      scale: zoomScale / 2 / Math.PI || scale,
-      translate: zoomTranslate || translate,
+      scale: scale,
+      translate: translate,
       center: controllerCenter
     })
+
+    this.proj = proj;
 
     var geo = geoPath(proj);
 
@@ -108,7 +137,6 @@ export default class MercatorController extends Component {
 
     extentRect.geometry.coordinates[0] = extent;
 
-
     return (
       <div style= {containerStyle}>
         <Chart
@@ -116,19 +144,23 @@ export default class MercatorController extends Component {
           height= {cHeight}
           center= {controllerCenter}
           projection= {proj}
-          onZoom= {onZoom}
           scaleExtent= {scaleExtent}
         >
           <MercatorControllerMap
             tiles= {controllerTiles}
+            scale= {scale}
           >
             {children}
           </MercatorControllerMap>
-          <Polygon
-            data= {extentRect}
-            geoPath= {geo}
-            polygonClass= {"react-d3-map-mobile__extent"}
-          />
+          <g
+            ref= {"extent"}
+          >
+            <Polygon
+              data= {extentRect}
+              geoPath= {geo}
+              polygonClass= {"react-d3-map-mobile__extent"}
+            />
+          </g>
         </Chart>
       </div>
     )

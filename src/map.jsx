@@ -26,9 +26,19 @@ export default class MobileMap extends Component {
   constructor(props) {
     super(props);
 
+    const {
+      width,
+      height,
+      center
+    } = props;
+
+    var translate = [width / 2, height / 2] || this.props.translate;
+
     this.state = {
       scale: this.props.scale,
-      times: 1
+      translate: translate,
+      times: 1,
+      center: center
     }
   }
 
@@ -52,7 +62,7 @@ export default class MobileMap extends Component {
     }
   }
 
-  zoomOut() {
+  zoomOut(){
     var times = this.state.times;
     var scaleSet = this.state.scale;
 
@@ -68,19 +78,26 @@ export default class MobileMap extends Component {
     }
   }
 
+  dragExtent(x, y) {
+    this.setState({
+      center: [x, y]
+    })
+  }
+
   onClickData() {
     console.log('click')
   }
 
   render() {
     const {
-      scale
+      scale,
+      translate,
+      center
     } = this.state;
 
     const {
       width,
       height,
-      center,
       projection,
       controllerScale
     } = this.props;
@@ -88,8 +105,7 @@ export default class MobileMap extends Component {
     var zoomIn = this.zoomIn.bind(this);
     var zoomOut = this.zoomOut.bind(this);
     var onClickData = this.onClickData.bind(this);
-
-    var translate = [width / 2, height / 2] || this.props.translate;
+    var dragExtent = this.dragExtent.bind(this);
 
     var proj = projectionFunc({
       projection: projection,
@@ -123,19 +139,20 @@ export default class MobileMap extends Component {
       }
     );
 
+    // controller height and width
+    var cHeight = 150;
+    var cWidth = width / 3;
+
     //map dims
     var mapDim = {
       topLine: [],
       bottomLine: []
     };
 
-    var samples = 8,
-      step = width / samples;
-
-    for (var i = 0; i < samples; i++) {
-      mapDim.topLine.push(proj.invert( [step * i,0] ))
-      mapDim.bottomLine.push(proj.invert( [step * (samples - i - 1),height] ))
-    }
+    mapDim.topLine.push(proj.invert([0, 0]))
+    mapDim.topLine.push(proj.invert([width, 0]))
+    mapDim.bottomLine.push(proj.invert([width, height]))
+    mapDim.bottomLine.push(proj.invert([0, height]))
 
     return (
       <div style= {styleContainer}>
@@ -157,6 +174,10 @@ export default class MobileMap extends Component {
           mapDim= {mapDim}
           controllerScale= {controllerScale}
           controllerCenter= {center}
+          cWidth= {cWidth}
+          cHeight= {cHeight}
+          dragExtent= {dragExtent}
+          center= {center}
         >
           {this.props.children}
         </MercatorController>
