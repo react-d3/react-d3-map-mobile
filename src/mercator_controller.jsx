@@ -54,10 +54,25 @@ export default class MercatorController extends Component {
       size: ([cWidth, cHeight])
     })
 
+    this.extentPosition = [0, 0]
+
     this.state = {
       proj: proj,
       geo: geo,
       controllerTiles: controllerTiles
+    }
+  }
+
+  componentDidUpdate() {
+    const {refresh} = this.props
+
+    if(refresh){
+      var extent = ReactDOM.findDOMNode(this.refs.extent);
+
+      d3.select(extent)
+        .attr("transform", "translate(0, 0)")
+
+      this.extentPosition = [0, 0]
     }
   }
 
@@ -74,11 +89,11 @@ export default class MercatorController extends Component {
 
     var extent = ReactDOM.findDOMNode(this.refs.extent);
     var that = this;
-    var newPosition = [0, 0];
 
     var drag = d3.behavior.drag()
       .on("drag", function(d,i) {
         var evt = d3.event;
+        var newPosition = that.extentPosition
 
         d3.select(this)
           .attr("transform", function(){
@@ -106,7 +121,8 @@ export default class MercatorController extends Component {
       controllerCenter,
       controllerScale,
       scaleExtent,
-      scale
+      scale,
+      refresh
     } = this.props;
 
     const {

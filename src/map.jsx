@@ -10,8 +10,7 @@ import {
   Chart,
   projection as projectionFunc,
   geoPath,
-  tileFunc,
-  ZoomControl
+  tileFunc
 } from 'react-d3-map-core';
 
 import {
@@ -21,6 +20,10 @@ import {
 import {
   default as MercatorController
 } from './mercator_controller'
+
+import {
+  default as ZoomControl
+} from './zoom'
 
 export default class MobileMap extends Component {
   constructor(props) {
@@ -38,7 +41,8 @@ export default class MobileMap extends Component {
       scale: this.props.scale,
       translate: translate,
       times: 1,
-      center: center
+      center: center,
+      refresh: false
     }
   }
 
@@ -57,7 +61,8 @@ export default class MobileMap extends Component {
     if(scaleSet < scale) {
       this.setState({
         times: times * 2,
-        scale: scaleSet * 2
+        scale: scaleSet * 2,
+        refresh: false
       })
     }
   }
@@ -73,14 +78,29 @@ export default class MobileMap extends Component {
     if(scaleSet / 4 > controllerScale) {
       this.setState({
         times: times / 2,
-        scale: scaleSet / 2
+        scale: scaleSet / 2,
+        refresh: false
       })
     }
   }
 
+  refreshEvt() {
+    const {
+      scale,
+      center
+    } = this.props;
+
+    this.setState({
+      scale: scale,
+      center: center,
+      refresh: true
+    })
+  }
+
   dragExtent(x, y) {
     this.setState({
-      center: [x, y]
+      center: [x, y],
+      refresh: false
     })
   }
 
@@ -92,7 +112,8 @@ export default class MobileMap extends Component {
     const {
       scale,
       translate,
-      center
+      center,
+      refresh
     } = this.state;
 
     const {
@@ -104,6 +125,7 @@ export default class MobileMap extends Component {
 
     var zoomIn = this.zoomIn.bind(this);
     var zoomOut = this.zoomOut.bind(this);
+    var refreshEvt = this.refreshEvt.bind(this);
     var onClickData = this.onClickData.bind(this);
     var dragExtent = this.dragExtent.bind(this);
 
@@ -178,14 +200,16 @@ export default class MobileMap extends Component {
           cHeight= {cHeight}
           dragExtent= {dragExtent}
           center= {center}
+          refresh= {refresh}
         >
           {this.props.children}
         </MercatorController>
         <ZoomControl
-          top= {height - 100}
-          left= {width - 50}
+          top= {height}
+          left= {width}
           zoomInClick= {zoomIn}
           zoomOutClick= {zoomOut}
+          refreshClick= {refreshEvt}
         />
       </div>
     )
