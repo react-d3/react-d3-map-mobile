@@ -10,37 +10,60 @@ import {
   Marker
 } from 'react-d3-map-core';
 
-export default class PolygonGroup extends Component {
+export default class MarkerGroup extends Component {
+
   render() {
     const {
       data,
       projection,
-      onClick
+      onClick,
+      markerClass
     } = this.props;
 
     var markers;
 
-    if(data && data !== []) {
-      if(Array.isArray(data)) {
-        markers = data.map((d, i) => {
+    if(data.type === 'FeatureCollection') {
+      var pointData = [];
+
+      // loop through features
+      data.features.forEach(function(d) {
+        pointData.push(d);
+      })
+    }else if(data.type === 'Feature') {
+      var pointData;
+
+      pointData = data;
+    }
+
+    if(pointData) {
+      if(Array.isArray(pointData)) {
+        markers = pointData.map((d, i) => {
+          var x = +projection(d.geometry.coordinates)[0];
+          var y = +projection(d.geometry.coordinates)[1];
+          var id = x + '-' + y;
           return (
             <Marker
-              id= {d.properties.react_d3_map_mobile__id}
+              id= {id}
               key= {i}
               data= {d}
-              x= {+projection(d.geometry.coordinates)[0]}
-              y= {+projection(d.geometry.coordinates)[1]}
+              x= {x}
+              y= {y}
               onClick= {onClick}
+              markerClass= {markerClass}
             />
           )
         })
       }else {
+        var x = +projection(d.geometry.coordinates)[0];
+        var y = +projection(d.geometry.coordinates)[1];
+        var id = x + '-' + y;
         markers = (<Marker
-          id= {data.properties.react_d3_map_mobile__id}
-          data= {data}
-          x= {+projection(data.geometry.coordinates)[0]}
-          y= {+projection(data.geometry.coordinates)[1]}
+          id= {id}
+          data= {pointData}
+          x= {x}
+          y= {y}
           onClick= {onClick}
+          markerClass= {markerClass}
         />)
       }
     }

@@ -82,8 +82,6 @@ export default class MobileMap extends Component {
       height,
       center,
       projection,
-      data,
-      content,
       controllerScale
     } = this.props;
 
@@ -114,6 +112,17 @@ export default class MobileMap extends Component {
       width: width
     }
 
+    // add projection and geoPath to children
+    var children = React.Children.map(
+      this.props.children,
+      (child) => {
+        return React.cloneElement(child, {
+          projection: proj,
+          geoPath: geo
+        })
+      }
+    );
+
     //map dims
     var mapDim = {
       topLine: [],
@@ -139,23 +148,18 @@ export default class MobileMap extends Component {
         >
           <Vector
             tiles= {tiles}
-            projection= {proj}
-            geoPath= {geo}
-            data= {data}
-            width= {width}
-            height= {height}
-            onClick= {onClickData}
-            {...this.state}
-          />
+          >
+            {children}
+          </Vector>
         </Chart>
         <MercatorController
-          width= {width}
-          height= {height}
-          controllerCenter= {center}
-          controllerScale= {controllerScale}
+          {...this.props}
           mapDim= {mapDim}
-          data= {data}
-        />
+          controllerScale= {controllerScale}
+          controllerCenter= {center}
+        >
+          {this.props.children}
+        </MercatorController>
         <ZoomControl
           top= {height - 100}
           left= {width - 50}

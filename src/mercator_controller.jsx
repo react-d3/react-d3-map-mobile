@@ -7,127 +7,83 @@ import {
 } from 'react'
 
 import {
-  default as topojson
-} from 'topojson'
-
-import {
-  default as world
-} from './data/world-50m'
-
-import {
   Chart,
-  Mesh,
-  Graticule,
   Polygon,
   geoPath,
-  projection as projectionFunc
+  projection as projectionFunc,
+  tileFunc
 } from 'react-d3-map-core'
 
 import {
-  default as LineGroup
-} from './components/line_group'
-
-import {
-  default as PolygonGroup
-} from './components/polygon_group'
-
-import {
-  default as PointGroup
-} from './components/point_group'
+  default as MercatorControllerMap
+} from './mercator_controller_map'
 
 export default class MercatorController extends Component {
   constructor(props) {
     super(props);
 
-    const {
-      data
-    } = this.props;
-
-    // seperate data to polygon, line, point and sent to different groups
-    if(data.type === 'FeatureCollection') {
-      var polygonData = [],
-          lineData = [],
-          pointData = [];
-
-      // loop through features
-      data.features.forEach(function(d) {
-        d.properties.react_d3_map__id = Math.floor(Math.random() * 100000)
-        if(d.geometry.type === 'Polygon' || d.geometry.type === 'MultiPolygon') {
-          // polygon
-          polygonData.push(d);
-        }else if (d.geometry.type === 'LineString' || d.geometry.type === 'MultiLineString') {
-          // line
-          lineData.push(d);
-        }else if (d.geometry.type === 'Point' || d.geometry.type === 'MultiPoint') {
-          // point
-          pointData.push(d);
-        }
-      })
-    }else if(data.type === 'Feature') {
-      var polygonData, lineData, pointData;
-
-      data.properties.react_d3_map__id = Math.floor(Math.random() * 100000)
-      if(data.geometry.type === 'Polygon' || data.geometry.type === 'MultiPolygon') {
-        // polygon
-        polygonData = data;
-      }else if (data.geometry.type === 'LineString' || data.geometry.type === 'MultiLineString') {
-        // line
-        lineData = data;
-      }else if (data.geometry.type === 'Point' || data.geometry.type === 'MultiPoint') {
-        // point
-        pointData = data;
-      }
-    }
-
     this.state = {
-      polygonData: polygonData,
-      lineData: lineData,
-      pointData: pointData
+      zoomTranslate: null,
+      zoomScale: null
     }
   }
 
-  static defaultProps = {
-    mesh : topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }),
-    land : topojson.feature(world, world.objects.land),
-    precision : .1,
-    projection: 'mercator'
+  onZoom(zoomScale, zoomTranslate) {
+    this.setState({
+      zoomTranslate: zoomTranslate,
+      zoomScale: zoomScale
+    })
   }
 
   render() {
 
     const {
-      polygonData,
-      lineData,
-      pointData
+      zoomTranslate,
+      zoomScale
     } = this.state;
 
     const {
-      width,
-      height,
-      projection,
-      precision,
-      mesh,
-      land,
-      controllerCenter,
+      mapDim,
       controllerScale,
-      mapDim
+      controllerCenter,
+      width,
+      projection
     } = this.props;
 
+    // controller height and width
     var cHeight = 150;
-    var cWidth = width / 3
+    var cWidth = width / 3;
+    var onZoom = this.onZoom.bind(this);
 
     var scale = controllerScale / 2 / Math.PI;
     var translate = [cWidth / 2, cHeight / 2];
+    var scaleExtent = [controllerScale, controllerScale];
 
     var proj = projectionFunc({
-      projection: projection,
-      scale: scale,
-      translate: translate,
-      center: controllerCenter,
-      precision: precision
+      projection: 'mercator',
+      scale: zoomScale / 2 / Math.PI || scale,
+      translate: zoomTranslate || translate,
+      center: controllerCenter
     })
 
     var geo = geoPath(proj);
+
+    // add projection and geoPath to children
+    var children = React.Children.map(
+      this.props.children,
+      (child) => {
+        return React.cloneElement(child, {
+          projection: proj,
+          geoPath: geo
+        })
+      }
+    );
+
+    var controllerTiles = tileFunc({
+      scale: proj.scale() * 2 * Math.PI,
+      translate: proj([0, 0]),
+      size: ([cWidth, cHeight])
+    })
 
     var containerStyle = {
       left: 0,
@@ -152,48 +108,26 @@ export default class MercatorController extends Component {
 
     extentRect.geometry.coordinates[0] = extent;
 
+
     return (
       <div style= {containerStyle}>
         <Chart
           width= {cWidth}
           height= {cHeight}
-          center= {[0, 0]}
+          center= {controllerCenter}
           projection= {proj}
+          onZoom= {onZoom}
+          scaleExtent= {scaleExtent}
         >
-          <Graticule
-            geoPath = {geo}
-          />
-          <Mesh
-            data= {mesh}
-            geoPath= {geo}
-          />
-          <Polygon
-            data= {land}
-            geoPath= {geo}
-          />
+          <MercatorControllerMap
+            tiles= {controllerTiles}
+          >
+            {children}
+          </MercatorControllerMap>
           <Polygon
             data= {extentRect}
             geoPath= {geo}
             polygonClass= {"react-d3-map-mobile__extent"}
-          />
-          <Polygon
-            data= {polygonData}
-            geoPath= {geo}
-          />
-          <PolygonGroup
-            data= {polygonData}
-            geoPath= {geo}
-            polygonClass= {'react-d3-map-mobile__mercator_controller__polygon_group'}
-          />
-          <LineGroup
-            data= {lineData}
-            geoPath= {geo}
-            meshClass= {'react-d3-map-mobile__mercator_controller__line_group'}
-          />
-          <PointGroup
-            data= {pointData}
-            geoPath= {geo}
-            pointClass= {'react-d3-map-mobile__mercator_controller__point_group'}
           />
         </Chart>
       </div>

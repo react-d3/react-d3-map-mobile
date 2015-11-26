@@ -21,13 +21,26 @@ export default class PolygonGroup extends Component {
 
     var polygons;
 
-    if(data && data !== []) {
-      if(Array.isArray(data)) {
-        polygons = data.map((d, i) => {
+    if(data.type === 'FeatureCollection') {
+      var polygonData = [];
+
+      // loop through features
+      data.features.forEach(function(d) {
+        polygonData.push(d);
+      })
+    }else if(data.type === 'Feature') {
+      var polygonData;
+
+      polygonData = data;
+    }
+
+    if(polygonData) {
+      if(Array.isArray(polygonData)) {
+        polygons = polygonData.map((d, i) => {
           return (
             <Polygon
-              id= {d.properties.react_d3_map_mobile__id}
-              key= {d.properties.react_d3_map_mobile__id}
+              id= {'react-d3-map__polygon' + i}
+              key= {'react-d3-map__polygon' + i}
               data= {d}
               geoPath= {geoPath}
               onClick= {onClick}
@@ -37,8 +50,8 @@ export default class PolygonGroup extends Component {
         })
       }else {
         polygons = (<Polygon
-          id= {data.properties.react_d3_map_mobile__id}
-          data= {data}
+          id= {'react-d3-map__polygon'}
+          data= {polygonData}
           geoPath= {geoPath}
           onClick= {onClick}
           polygonClass= {polygonClass}

@@ -1,25 +1,25 @@
-
 "use strict"
 
 import {
   default as React,
   Component,
   PropTypes
-} from 'react';
+} from 'react'
 
 import {
   Tile
-} from 'react-d3-map-core';
+} from 'react-d3-map-core'
 
-export default class Vector extends Component {
+export default class MercatorControllerMap extends Component {
   constructor(props) {
-    super (props);
+    super(props);
   }
 
   render() {
+
     const {
       tiles
-    } = this.props
+    } = this.props;
 
     return (
       <g>
@@ -32,5 +32,6 @@ export default class Vector extends Component {
         {this.props.children}
       </g>
     )
+
   }
 }

@@ -5,6 +5,7 @@ var ReactDOM = require('react-dom');
 var topojson = require('topojson');
 
 var MobileMap = require('../../lib/index').MobileMap;
+var PolygonGroup = require('../../lib/index').PolygonGroup;
 
 var css= require('./css/polygon.css');
 
@@ -25,9 +26,13 @@ var css= require('./css/polygon.css');
       scale= {scale}
       controllerScale= {controllerScale}
       center= {center}
-      data= {data}
-      content= {content}
-    />
+    >
+      <PolygonGroup
+        data= {data}
+        content= {content}
+        polygonClass= {'react-d3-map-mobile__mercator_controller__polygon_group'}
+      />
+    </MobileMap>
   , document.getElementById('blank-container')
   )
 

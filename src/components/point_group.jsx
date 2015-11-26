@@ -22,13 +22,26 @@ export default class PointGroup extends Component {
 
     var points;
 
-    if(data && data !== []) {
-      if(Array.isArray(data)) {
-        points = data.map((d, i) => {
+    if(data.type === 'FeatureCollection') {
+      var pointData = [];
+
+      // loop through features
+      data.features.forEach(function(d) {
+        pointData.push(d);
+      })
+    }else if(data.type === 'Feature') {
+      var pointData;
+
+      pointData = data;
+    }
+
+    if(pointData) {
+      if(Array.isArray(pointData)) {
+        points = pointData.map((d, i) => {
           return (
             <Point
-              id= {d.properties.react_d3_map_mobile__id}
-              key= {i}
+              id= {'react-d3-map__point' + i}
+              key= {'react-d3-map__point' + i}
               data= {d}
               geoPath= {geoPath}
               onClick= {onClick}
@@ -38,8 +51,8 @@ export default class PointGroup extends Component {
         })
       }else {
         points = (<Point
-          id= {data.properties.react_d3_map_mobile__id}
-          data= {data}
+          id= {'react-d3-map__point'}
+          data= {pointData}
           geoPath= {geoPath}
           onClick= {onClick}
           pointClass= {pointClass}

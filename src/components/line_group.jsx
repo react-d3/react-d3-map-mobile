@@ -22,13 +22,26 @@ export default class MeshGroup extends Component {
 
     var meshs;
 
-    if(data && data !== []) {
-      if(Array.isArray(data)) {
-        meshs = data.map((d, i) => {
+    if(data.type === 'FeatureCollection') {
+      var lineData = [];
+
+      // loop through features
+      data.features.forEach(function(d) {
+        lineData.push(d);
+      })
+    }else if(data.type === 'Feature') {
+      var lineData;
+
+      lineData = data;
+    }
+
+    if(lineData) {
+      if(Array.isArray(lineData)) {
+        meshs = lineData.map((d, i) => {
           return (
             <Mesh
-              id= {d.properties.react_d3_map_mobile__id}
-              key= {i}
+              id= {'react-d3-map__mesh' + i}
+              key= {'react-d3-map__mesh' + i}
               data= {d}
               geoPath= {geoPath}
               onClick= {onClick}
@@ -38,8 +51,8 @@ export default class MeshGroup extends Component {
         })
       }else {
         meshs = (<Mesh
-          id= {data.properties.react_d3_map_mobile__id}
-          data= {data}
+          id= {'react-d3-map__mesh'}
+          data= {lineData}
           geoPath= {geoPath}
           onClick= {onClick}
           meshClass= {meshClass}
