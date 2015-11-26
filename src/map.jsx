@@ -54,7 +54,7 @@ export default class MobileMap extends Component {
       scale
     } = this.props;
 
-    if(scaleSet * 2 < scale) {
+    if(scaleSet < scale) {
       this.setState({
         times: times * 2,
         scale: scaleSet * 2
@@ -70,7 +70,7 @@ export default class MobileMap extends Component {
       controllerScale
     } = this.props;
 
-    if(scaleSet / 2 > controllerScale) {
+    if(scaleSet / 4 > controllerScale) {
       this.setState({
         times: times / 2,
         scale: scaleSet / 2

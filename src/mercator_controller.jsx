@@ -27,14 +27,37 @@ import {
 export default class MercatorController extends Component {
   constructor(props) {
     super(props);
-  }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    if(nextProps.center
-      !== this.props.center) {
-      return false;
-    }else {
-      return true;
+    const {
+      controllerScale,
+      controllerCenter,
+      cWidth,
+      cHeight,
+      projection
+    } = this.props;
+
+    var scale = controllerScale / 2 / Math.PI;
+    var translate = [cWidth / 2, cHeight / 2];
+
+    var proj = projectionFunc({
+      projection: 'mercator',
+      scale: scale,
+      translate: translate,
+      center: controllerCenter
+    })
+
+    var geo = geoPath(proj);
+
+    var controllerTiles = tileFunc({
+      scale: proj.scale() * 2 * Math.PI,
+      translate: proj([0, 0]),
+      size: ([cWidth, cHeight])
+    })
+
+    this.state = {
+      proj: proj,
+      geo: geo,
+      controllerTiles: controllerTiles
     }
   }
 
@@ -43,7 +66,11 @@ export default class MercatorController extends Component {
       cWidth,
       dragExtent,
       controllerCenter
-    } = this.props
+    } = this.props;
+
+    const {
+      proj
+    } = this.state;
 
     var extent = ReactDOM.findDOMNode(this.refs.extent);
     var that = this;
@@ -60,9 +87,8 @@ export default class MercatorController extends Component {
             return "translate(" + newPosition[0] + ',' + newPosition[1] + ")"
           })
 
-        console.log(controllerCenter)
-        var centerPx = that.proj(controllerCenter)
-        var pos = that.proj.invert([centerPx[0] + newPosition[0], centerPx[1] + newPosition[1]])
+        var centerPx = proj(controllerCenter)
+        var pos = proj.invert([centerPx[0] + newPosition[0], centerPx[1] + newPosition[1]])
         // sent the center coordinates to the map
         dragExtent(pos[0], pos[1])
       });
@@ -75,27 +101,19 @@ export default class MercatorController extends Component {
 
     const {
       mapDim,
-      controllerScale,
-      controllerCenter,
-      cWidth,
       cHeight,
-      projection
+      cWidth,
+      controllerCenter,
+      controllerScale,
+      scaleExtent,
+      scale
     } = this.props;
 
-    var scale = controllerScale / 2 / Math.PI;
-    var translate = [cWidth / 2, cHeight / 2];
-    var scaleExtent = [controllerScale, controllerScale];
-
-    var proj = projectionFunc({
-      projection: 'mercator',
-      scale: scale,
-      translate: translate,
-      center: controllerCenter
-    })
-
-    this.proj = proj;
-
-    var geo = geoPath(proj);
+    const {
+      geo,
+      proj,
+      controllerTiles
+    } = this.state;
 
     // add projection and geoPath to children
     var children = React.Children.map(
@@ -108,12 +126,6 @@ export default class MercatorController extends Component {
       }
     );
 
-    var controllerTiles = tileFunc({
-      scale: proj.scale() * 2 * Math.PI,
-      translate: proj([0, 0]),
-      size: ([cWidth, cHeight])
-    })
-
     var containerStyle = {
       left: 0,
       bottom: 0,
@@ -123,9 +135,19 @@ export default class MercatorController extends Component {
       boxShadow: 'none',
       marginLeft: '10px',
       marginBottom: '10px',
-      cursor: 'pointer',
       backgroundColor: '#EEE'
     }
+
+    var translate = [cWidth / 2, cHeight / 2];
+
+    var projExtent = projectionFunc({
+      projection: 'mercator',
+      scale: controllerScale / 2 / Math.PI,
+      translate: translate,
+      center: controllerCenter
+    })
+
+    var geoExtent = geoPath(projExtent);
 
     var extent = mapDim.topLine.concat(mapDim.bottomLine);
     extent.push([mapDim.topLine[0]])
@@ -157,7 +179,7 @@ export default class MercatorController extends Component {
           >
             <Polygon
               data= {extentRect}
-              geoPath= {geo}
+              geoPath= {geoExtent}
               polygonClass= {"react-d3-map-mobile__extent"}
             />
           </g>
