@@ -18,18 +18,14 @@ import {
 } from './vector';
 
 import {
-  default as MercatorController
-} from './mercator_controller'
+  default as OrthographicController
+} from './orthographic_controller'
 
 import {
   default as ZoomControl
 } from './zoom'
 
-import {
-  default as ZoomTabControl
-} from './zoom_tab'
-
-export default class MobileMap extends Component {
+export default class OrthographicMobileMap extends Component {
   constructor(props) {
     super(props);
 
@@ -52,7 +48,8 @@ export default class MobileMap extends Component {
   }
 
   static defaultProps = {
-    projection: 'mercator'
+    projection: 'mercator',
+    controllerScale: 1 << 7
   }
 
   zoomIn() {
@@ -87,8 +84,7 @@ export default class MobileMap extends Component {
         times: times / 2,
         scale: scaleSet / 2,
         refresh: false,
-        dragStart: false,
-        dragEnded: false
+        dragStart: false
       })
     }
   }
@@ -103,8 +99,7 @@ export default class MobileMap extends Component {
       scale: scale,
       center: center,
       refresh: true,
-      dragStart: false,
-      dragEnded: false
+      dragStart: false
     })
   }
 
@@ -112,22 +107,7 @@ export default class MobileMap extends Component {
     this.setState({
       center: [x, y],
       refresh: false,
-      dragStart: true,
-      dragEnded: false
-    })
-  }
-
-  dragEnd() {
-    this.setState({
-      dragStart: false,
-      dragEnded: true
-    })
-  }
-
-  resetDrag() {
-    this.setState({
-      dragStart: false,
-      dragEnded: false
+      dragStart: true
     })
   }
 
@@ -141,8 +121,7 @@ export default class MobileMap extends Component {
       translate,
       center,
       refresh,
-      dragStart,
-      dragEnded
+      dragStart
     } = this.state;
 
     const {
@@ -158,8 +137,6 @@ export default class MobileMap extends Component {
     var refreshEvt = this.refreshEvt.bind(this);
     var onClickData = this.onClickData.bind(this);
     var dragExtent = this.dragExtent.bind(this);
-    var dragEnd = this.dragEnd.bind(this);
-    var resetDrag = this.resetDrag.bind(this);
 
     var proj = projectionFunc({
       projection: projection,
@@ -194,8 +171,8 @@ export default class MobileMap extends Component {
     );
 
     // controller height and width
-    var cHeight = 150;
-    var cWidth = width / 3;
+    var cHeight = height / 2;
+    var cWidth = height / 2;
 
     //map dims
     var mapDim = {
@@ -243,7 +220,7 @@ export default class MobileMap extends Component {
             {children}
           </Vector>
         </Chart>
-        <MercatorController
+        <OrthographicController
           {...this.props}
           mapDim= {mapDim}
           controllerScale= {controllerScale}
@@ -251,18 +228,14 @@ export default class MobileMap extends Component {
           cWidth= {cWidth}
           cHeight= {cHeight}
           dragExtent= {dragExtent}
-          dragEnd= {dragEnd}
-          dragEnded= {dragEnded}
           dragStart= {dragStart}
-          resetDrag= {resetDrag}
           center= {center}
           refresh= {refresh}
           zoomInClick= {zoomIn}
           zoomOutClick= {zoomOut}
-          tabMode= {tabMode}
         >
           {this.props.children}
-        </MercatorController>
+        </OrthographicController>
         {btnGroup}
       </div>
     )

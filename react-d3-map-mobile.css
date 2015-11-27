@@ -24,3 +24,13 @@
   opacity: .4 !important;
   stroke-width: 1 !important;
 }
+
+.react-d3-map-mobile__land {
+  fill: rgb(84, 77, 69) !important;
+  stroke-opacity: 1 !important;
+}
+
+.react-d3-map-mobile__mesh {
+  fill: #CCC !important;
+  stroke-width: .2;
+}

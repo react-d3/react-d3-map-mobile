@@ -138,7 +138,8 @@ export default class MercatorController extends Component {
       zoomOutClick,
       dragStart,
       dragEnded,
-      resetDrag
+      resetDrag,
+      tabMode
     } = this.props;
 
     const {
@@ -206,10 +207,9 @@ export default class MercatorController extends Component {
           timer = null;
         }else {
           timer = setTimeout(() => {
-            if(dbClick == false) {
+            if(dbClick === false) {
               zoomInClick();
             }
-
             timer = null;
           }, 300);
         }
@@ -224,7 +224,7 @@ export default class MercatorController extends Component {
         style= {containerStyle}
       >
         <g
-          onClick= {fireOnClick}
+          onClick= {tabMode? fireOnClick: null}
         >
           <Chart
             width= {cWidth}
@@ -240,7 +240,6 @@ export default class MercatorController extends Component {
               {children}
             </MercatorControllerMap>
             <g
-
               ref= {"extent"}
             >
               <Polygon
