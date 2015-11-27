@@ -21,34 +21,7 @@ import OrthographicControllerMap from './orthographic_controller_map'
 export default class OrthographicController extends Component {
   constructor(props) {
     super(props);
-
-    const {
-      controllerScale,
-      controllerCenter,
-      cWidth,
-      cHeight,
-      projection
-    } = this.props;
-
-    var scale = controllerScale;
-    var translate = [cWidth / 2, cHeight / 2];
-
-    var proj = projectionFunc({
-      projection: 'orthographic',
-      scale: scale,
-      translate: translate,
-      rotate: [-controllerCenter[0], -controllerCenter[1]],
-      clipAngle: 90
-    })
-
-    var geo = geoPath(proj);
-
     this.extentPosition = [0, 0]
-
-    this.state = {
-      proj: proj,
-      geo: geo
-    }
   }
 
   static defaultProps = {
@@ -59,11 +32,6 @@ export default class OrthographicController extends Component {
     const {refresh} = this.props
 
     if(refresh){
-      var extent = ReactDOM.findDOMNode(this.refs.extent);
-
-      d3.select(extent)
-        .attr("transform", "translate(0, 0)")
-
       this.extentPosition = [0, 0]
     }
   }
@@ -71,14 +39,23 @@ export default class OrthographicController extends Component {
   componentDidMount() {
     const {
       cWidth,
+      cHeight,
       sens,
       dragExtent,
-      controllerCenter
+      controllerCenter,
+      globalRotate,
+      controllerScale
     } = this.props;
 
-    const {
-      proj
-    } = this.state;
+    var translate = [cWidth / 2, cHeight / 2];
+
+    var proj = projectionFunc({
+      projection: 'orthographic',
+      scale: controllerScale,
+      translate: translate,
+      rotate: globalRotate,
+      clipAngle: 90
+    })
 
     var orthograpic = ReactDOM.findDOMNode(this.refs['orthographic-map']);
     var that = this;
@@ -92,25 +69,33 @@ export default class OrthographicController extends Component {
         };
       })
       .on("drag", function(d,i) {
+        var centerPx = proj(controllerCenter)
+        var newPosition = that.extentPosition
+
+        var evt = d3.event;
         var rotate = proj.rotate();
-        proj.rotate([
-          d3.event.x * sens,
-          -d3.event.y * sens,
+
+        newPosition[0] += evt.dx;
+        newPosition[1] += evt.dy;
+
+        var pos = proj.invert([centerPx[0] - newPosition[0], centerPx[1] - newPosition[1]])
+        // sent the center coordinates to the map
+        dragExtent(pos, [
+          evt.x * sens,
+          -evt.y * sens,
           rotate[2]
         ])
-
-        that.setProjection(proj)
       })
 
     d3.select(orthograpic)
       .call(drag);
   }
 
-  setProjection(proj) {
-    this.setState({
-      proj: proj
-    })
-  }
+  // setProjection(proj) {
+  //   this.setState({
+  //     proj: proj
+  //   })
+  // }
 
   render() {
 
@@ -125,13 +110,21 @@ export default class OrthographicController extends Component {
       refresh,
       zoomInClick,
       zoomOutClick,
-      dragStart
+      dragStart,
+      globalRotate
     } = this.props;
 
-    const {
-      geo,
-      proj
-    } = this.state;
+    var translate = [cWidth / 2, cHeight / 2];
+
+    var proj = projectionFunc({
+      projection: 'orthographic',
+      scale: controllerScale,
+      translate: translate,
+      rotate: globalRotate,
+      clipAngle: 90
+    })
+
+    var geo = geoPath(proj);
 
     // add projection and geoPath to children
     var children = React.Children.map(
@@ -152,7 +145,7 @@ export default class OrthographicController extends Component {
       marginBottom: '10px',
     }
 
-    var geoExtent = geoPath(proj);
+    // var geoExtent = geoPath(proj);
 
     var extent = mapDim.topLine.concat(mapDim.bottomLine);
     extent.push([mapDim.topLine[0]])
@@ -189,7 +182,7 @@ export default class OrthographicController extends Component {
             </OrthographicControllerMap>
             <Polygon
               data= {extentRect}
-              geoPath= {geoExtent}
+              geoPath= {geo}
               polygonClass= {"react-d3-map-mobile__extent"}
             />
           </g>

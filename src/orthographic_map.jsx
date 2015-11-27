@@ -43,7 +43,8 @@ export default class OrthographicMobileMap extends Component {
       times: 1,
       center: center,
       refresh: false,
-      dragStart: false
+      dragStart: false,
+      globalRotate: [-center[0], -center[1]]
     }
   }
 
@@ -98,14 +99,17 @@ export default class OrthographicMobileMap extends Component {
     this.setState({
       scale: scale,
       center: center,
+      globalRotate: [-center[0], -center[1]],
       refresh: true,
       dragStart: false
     })
   }
 
-  dragExtent(x, y) {
+  dragExtent(center, rotate) {
+
     this.setState({
-      center: [x, y],
+      center: center,
+      globalRotate: rotate,
       refresh: false,
       dragStart: true
     })
@@ -121,7 +125,8 @@ export default class OrthographicMobileMap extends Component {
       translate,
       center,
       refresh,
-      dragStart
+      dragStart,
+      globalRotate
     } = this.state;
 
     const {
@@ -229,6 +234,7 @@ export default class OrthographicMobileMap extends Component {
           cHeight= {cHeight}
           dragExtent= {dragExtent}
           dragStart= {dragStart}
+          globalRotate= {globalRotate}
           center= {center}
           refresh= {refresh}
           zoomInClick= {zoomIn}
