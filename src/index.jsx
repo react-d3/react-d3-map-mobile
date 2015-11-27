@@ -1,10 +1,10 @@
 import {
-  default as MobileMap
-} from './map'
+  default as MercatorMobileMap
+} from './mercator_map'
 
 var css = require('../react-d3-map-mobile.css')
 
-export {MobileMap}
+export {MercatorMobileMap}
 
 import {
   default as LineGroup

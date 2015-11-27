@@ -6,6 +6,10 @@ import {
   PropTypes
 } from 'react';
 
+import {
+  default as Refresh
+} from './refresh'
+
 export default class ZoomControl extends Component {
   constructor (props) {
     super(props);
@@ -46,6 +50,7 @@ export default class ZoomControl extends Component {
       border: '2px solid rgba(0,0,0,0.2)',
       marginBottom: '15px',
       textAlign: 'center',
+      fontWeight: 'bolder',
       textDecoration: 'none',
       color: 'black',
       display: 'block'
@@ -59,23 +64,8 @@ export default class ZoomControl extends Component {
       fontSize: '50px',
       backgroundColor: '#fff',
       border: '2px solid rgba(0,0,0,0.2)',
-      textAlign: 'center',
-      textDecoration: 'none',
-      color: 'black',
-      display: 'block'
-    }
-
-    var refreshStyle = {
-      width: '50px',
-      height: '50px',
-      lineHeight: '50px',
-      borderRadius: '25px',
-      fontSize: '35px',
-      backgroundColor: '#fff',
-      marginBottom: '15px',
-      border: '2px solid rgba(0,0,0,0.2)',
-      textAlign: 'center',
       fontWeight: 'bolder',
+      textAlign: 'center',
       textDecoration: 'none',
       color: 'black',
       display: 'block'
@@ -83,7 +73,9 @@ export default class ZoomControl extends Component {
 
     return (
       <div className="react-d3-map-core__zoom-control" style= {zoomControlStyle}>
-        <a className="react-d3-map-core__zoom-control__refresh" style={refreshStyle} onClick={refreshClick}>&#x21bb;</a>
+        <Refresh
+          refreshClick= {refreshClick}
+        />
         <a className="react-d3-map-core__zoom-control__zoom-in" style={zoomInStyle} onClick={zoomInClick}>+</a>
         <a className="react-d3-map-core__zoom-control__zoom-out" style={zoomOutStyle} onClick={zoomOutClick}>-</a>
       </div>
