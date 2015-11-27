@@ -36,4 +36,23 @@ var css= require('./css/polygon.css');
   , document.getElementById('blank-container')
   )
 
+  ReactDOM.render(
+    <MercatorMobileMap
+      width= {width}
+      height= {height}
+      scale= {scale}
+      controllerScale= {controllerScale}
+      center= {center}
+      tabMode= {true}
+    >
+      <PolygonGroup
+        data= {data}
+        content= {content}
+        polygonClass= {'react-d3-map-mobile__mercator_controller__polygon_group'}
+      />
+    </MercatorMobileMap>
+  , document.getElementById('blank-container-tab')
+  )
+
+
 })()

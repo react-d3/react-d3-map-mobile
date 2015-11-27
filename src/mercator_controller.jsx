@@ -55,6 +55,8 @@ export default class MercatorController extends Component {
     })
 
     this.extentPosition = [0, 0]
+    this.dbClick = false;
+    this.timer = null;
 
     this.state = {
       proj: proj,
@@ -80,7 +82,8 @@ export default class MercatorController extends Component {
     const {
       cWidth,
       dragExtent,
-      controllerCenter
+      controllerCenter,
+      dragEnd
     } = this.props;
 
     const {
@@ -89,9 +92,11 @@ export default class MercatorController extends Component {
 
     var extent = ReactDOM.findDOMNode(this.refs.extent);
     var that = this;
+    var dragging;
 
     var drag = d3.behavior.drag()
       .on("drag", function(d,i) {
+        dragging = true;
         var evt = d3.event;
         var newPosition = that.extentPosition
 
@@ -106,7 +111,13 @@ export default class MercatorController extends Component {
         var pos = proj.invert([centerPx[0] + newPosition[0], centerPx[1] + newPosition[1]])
         // sent the center coordinates to the map
         dragExtent(pos[0], pos[1])
-      });
+      })
+      .on("dragend", () => {
+        if(dragging) {
+          dragEnd();
+          dragging = false
+        }
+      })
 
     d3.select(extent)
       .call(drag);
@@ -122,7 +133,12 @@ export default class MercatorController extends Component {
       controllerScale,
       scaleExtent,
       scale,
-      refresh
+      refresh,
+      zoomInClick,
+      zoomOutClick,
+      dragStart,
+      dragEnded,
+      resetDrag
     } = this.props;
 
     const {
@@ -156,6 +172,7 @@ export default class MercatorController extends Component {
 
     var translate = [cWidth / 2, cHeight / 2];
 
+    // find extent
     var projExtent = projectionFunc({
       projection: 'mercator',
       scale: controllerScale / 2 / Math.PI,
@@ -175,31 +192,65 @@ export default class MercatorController extends Component {
 
     extentRect.geometry.coordinates[0] = extent;
 
+    // delay onclick function, check if it is double click or not
+    var dbClick = this.dbClick;
+    var timer = this.timer;
+
+    var fireOnClick = () => {
+      if(!dragStart && !dragEnded) {
+        // if not drag event
+        if(timer) {
+          dbClick = true;
+          zoomOutClick();
+          clearTimeout(timer);
+          timer = null;
+        }else {
+          timer = setTimeout(() => {
+            if(dbClick == false) {
+              zoomInClick();
+            }
+
+            timer = null;
+          }, 300);
+        }
+      }else if (!dragStart && dragEnded) {
+        // reset drag state
+        resetDrag();
+      }
+    }
+
     return (
-      <div style= {containerStyle}>
-        <Chart
-          width= {cWidth}
-          height= {cHeight}
-          center= {controllerCenter}
-          projection= {proj}
-          scaleExtent= {scaleExtent}
+      <div
+        style= {containerStyle}
+      >
+        <g
+          onClick= {fireOnClick}
         >
-          <MercatorControllerMap
-            tiles= {controllerTiles}
-            scale= {scale}
+          <Chart
+            width= {cWidth}
+            height= {cHeight}
+            center= {controllerCenter}
+            projection= {proj}
+            scaleExtent= {scaleExtent}
           >
-            {children}
-          </MercatorControllerMap>
-          <g
-            ref= {"extent"}
-          >
-            <Polygon
-              data= {extentRect}
-              geoPath= {geoExtent}
-              polygonClass= {"react-d3-map-mobile__extent"}
-            />
-          </g>
-        </Chart>
+            <MercatorControllerMap
+              tiles= {controllerTiles}
+              scale= {scale}
+            >
+              {children}
+            </MercatorControllerMap>
+            <g
+
+              ref= {"extent"}
+            >
+              <Polygon
+                data= {extentRect}
+                geoPath= {geoExtent}
+                polygonClass= {"react-d3-map-mobile__extent"}
+              />
+            </g>
+          </Chart>
+        </g>
       </div>
     )
 

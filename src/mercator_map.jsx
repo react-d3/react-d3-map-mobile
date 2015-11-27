@@ -25,6 +25,10 @@ import {
   default as ZoomControl
 } from './zoom'
 
+import {
+  default as ZoomTabControl
+} from './zoom_tab'
+
 export default class MobileMap extends Component {
   constructor(props) {
     super(props);
@@ -42,7 +46,8 @@ export default class MobileMap extends Component {
       translate: translate,
       times: 1,
       center: center,
-      refresh: false
+      refresh: false,
+      dragStart: false
     }
   }
 
@@ -62,7 +67,9 @@ export default class MobileMap extends Component {
       this.setState({
         times: times * 2,
         scale: scaleSet * 2,
-        refresh: false
+        refresh: false,
+        dragStart: false,
+        dragEnded: false
       })
     }
   }
@@ -79,7 +86,9 @@ export default class MobileMap extends Component {
       this.setState({
         times: times / 2,
         scale: scaleSet / 2,
-        refresh: false
+        refresh: false,
+        dragStart: false,
+        dragEnded: false
       })
     }
   }
@@ -93,14 +102,32 @@ export default class MobileMap extends Component {
     this.setState({
       scale: scale,
       center: center,
-      refresh: true
+      refresh: true,
+      dragStart: false,
+      dragEnded: false
     })
   }
 
   dragExtent(x, y) {
     this.setState({
       center: [x, y],
-      refresh: false
+      refresh: false,
+      dragStart: true,
+      dragEnded: false
+    })
+  }
+
+  dragEnd() {
+    this.setState({
+      dragStart: false,
+      dragEnded: true
+    })
+  }
+
+  resetDrag() {
+    this.setState({
+      dragStart: false,
+      dragEnded: false
     })
   }
 
@@ -113,14 +140,17 @@ export default class MobileMap extends Component {
       scale,
       translate,
       center,
-      refresh
+      refresh,
+      dragStart,
+      dragEnded
     } = this.state;
 
     const {
       width,
       height,
       projection,
-      controllerScale
+      controllerScale,
+      tabMode
     } = this.props;
 
     var zoomIn = this.zoomIn.bind(this);
@@ -128,6 +158,8 @@ export default class MobileMap extends Component {
     var refreshEvt = this.refreshEvt.bind(this);
     var onClickData = this.onClickData.bind(this);
     var dragExtent = this.dragExtent.bind(this);
+    var dragEnd = this.dragEnd.bind(this);
+    var resetDrag = this.resetDrag.bind(this);
 
     var proj = projectionFunc({
       projection: projection,
@@ -176,6 +208,26 @@ export default class MobileMap extends Component {
     mapDim.bottomLine.push(proj.invert([width, height]))
     mapDim.bottomLine.push(proj.invert([0, height]))
 
+    if(!tabMode) {
+      var btnGroup = (
+        <ZoomControl
+          top= {height}
+          left= {width}
+          zoomInClick= {zoomIn}
+          zoomOutClick= {zoomOut}
+          refreshClick= {refreshEvt}
+        />
+      )
+    }else {
+      var btnGroup = (
+        <ZoomTabControl
+          top= {height}
+          left= {width}
+          refreshClick= {refreshEvt}
+        />
+      )
+    }
+
     return (
       <div style= {styleContainer}>
         <Chart
@@ -199,18 +251,18 @@ export default class MobileMap extends Component {
           cWidth= {cWidth}
           cHeight= {cHeight}
           dragExtent= {dragExtent}
+          dragEnd= {dragEnd}
+          dragEnded= {dragEnded}
+          dragStart= {dragStart}
+          resetDrag= {resetDrag}
           center= {center}
           refresh= {refresh}
+          zoomInClick= {zoomIn}
+          zoomOutClick= {zoomOut}
         >
           {this.props.children}
         </MercatorController>
-        <ZoomControl
-          top= {height}
-          left= {width}
-          zoomInClick= {zoomIn}
-          zoomOutClick= {zoomOut}
-          refreshClick= {refreshEvt}
-        />
+        {btnGroup}
       </div>
     )
 
