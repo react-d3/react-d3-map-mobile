@@ -176,8 +176,8 @@ export default class OrthographicMobileMap extends Component {
     );
 
     // controller height and width
-    var cHeight = height / 2;
-    var cWidth = height / 2;
+    var cHeight = width / 2;
+    var cWidth = width / 2;
 
     //map dims
     var mapDim = {

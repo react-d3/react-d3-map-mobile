@@ -25,7 +25,7 @@ export default class OrthographicController extends Component {
   }
 
   static defaultProps = {
-    sens: 1
+    sens: .25
   }
 
   componentDidUpdate() {
@@ -91,12 +91,6 @@ export default class OrthographicController extends Component {
       .call(drag);
   }
 
-  // setProjection(proj) {
-  //   this.setState({
-  //     proj: proj
-  //   })
-  // }
-
   render() {
 
     const {
@@ -155,7 +149,6 @@ export default class OrthographicController extends Component {
       "geometry": { "type": "Polygon", "coordinates": [[]]}
     };
 
-    // console.log(geoExtent.centroid(extentRect))
     extentRect.geometry.coordinates[0] = extent;
 
     return (
