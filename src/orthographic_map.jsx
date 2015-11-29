@@ -53,6 +53,18 @@ export default class OrthographicMobileMap extends Component {
     controllerScale: 1 << 7
   }
 
+  static childContextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired
+  }
+
+  getChildContext() {
+    return {
+      geoPath: this.geoPath,
+      projection: this.projection
+    };
+  }
+
   zoomIn() {
     var times = this.state.times;
     var scaleSet = this.state.scale;
@@ -151,6 +163,9 @@ export default class OrthographicMobileMap extends Component {
 
     var geo = geoPath(proj);
 
+    this.projection = proj;
+    this.geoPath = geo;
+
     var tiles = tileFunc({
       scale: proj.scale() * 2 * Math.PI,
       translate: proj([0, 0]),
@@ -162,17 +177,6 @@ export default class OrthographicMobileMap extends Component {
       backgroundColor: '#EEE',
       width: width
     }
-
-    // add projection and geoPath to children
-    var children = React.Children.map(
-      this.props.children,
-      (child) => {
-        return React.cloneElement(child, {
-          projection: proj,
-          geoPath: geo
-        })
-      }
-    );
 
     // controller height and width
     var cHeight = width / 2;
@@ -221,7 +225,7 @@ export default class OrthographicMobileMap extends Component {
           <Vector
             tiles= {tiles}
           >
-            {children}
+            {this.props.children}
           </Vector>
         </Chart>
         <OrthographicController

@@ -15,7 +15,8 @@
 }
 
 .react-d3-map-mobile__mercator_controller__line_group {
-  fill: blue !important;
+  stroke: blue !important;
+  stroke-width: 3 !important;
   opacity: .4 !important;
 }
 

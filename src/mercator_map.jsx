@@ -22,6 +22,10 @@ import {
 } from './mercator_controller'
 
 import {
+  default as OverlayContent
+} from './overlay_content'
+
+import {
   default as ZoomControl
 } from './zoom'
 
@@ -47,12 +51,29 @@ export default class MobileMap extends Component {
       times: 1,
       center: center,
       refresh: false,
-      dragStart: false
+      dragStart: false,
+      overlayContent: null
     }
   }
 
   static defaultProps = {
     projection: 'mercator'
+  }
+
+  static childContextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired,
+    closeOverlay: React.PropTypes.func.isRequired
+  }
+
+  getChildContext() {
+    return {
+      geoPath: this.geoPath,
+      projection: this.projection,
+      showOverlay: this.showOverlay.bind(this),
+      closeOverlay: this.closeOverlay.bind(this)
+    };
   }
 
   zoomIn() {
@@ -131,8 +152,16 @@ export default class MobileMap extends Component {
     })
   }
 
-  onClickData() {
-    console.log('click')
+  showOverlay(dom, d, overlayContent, i) {
+    this.setState({
+      overlayContent: overlayContent(d)
+    })
+  }
+
+  closeOverlay() {
+    this.setState({
+      overlayContent: null
+    })
   }
 
   render() {
@@ -142,7 +171,8 @@ export default class MobileMap extends Component {
       center,
       refresh,
       dragStart,
-      dragEnded
+      dragEnded,
+      overlayContent
     } = this.state;
 
     const {
@@ -155,8 +185,8 @@ export default class MobileMap extends Component {
 
     var zoomIn = this.zoomIn.bind(this);
     var zoomOut = this.zoomOut.bind(this);
+    var closeOverlay = this.closeOverlay.bind(this);
     var refreshEvt = this.refreshEvt.bind(this);
-    var onClickData = this.onClickData.bind(this);
     var dragExtent = this.dragExtent.bind(this);
     var dragEnd = this.dragEnd.bind(this);
     var resetDrag = this.resetDrag.bind(this);
@@ -170,6 +200,9 @@ export default class MobileMap extends Component {
 
     var geo = geoPath(proj);
 
+    this.projection = proj;
+    this.geoPath = geo;
+
     var tiles = tileFunc({
       scale: proj.scale() * 2 * Math.PI,
       translate: proj([0, 0]),
@@ -181,17 +214,6 @@ export default class MobileMap extends Component {
       backgroundColor: '#EEE',
       width: width
     }
-
-    // add projection and geoPath to children
-    var children = React.Children.map(
-      this.props.children,
-      (child) => {
-        return React.cloneElement(child, {
-          projection: proj,
-          geoPath: geo
-        })
-      }
-    );
 
     // controller height and width
     var cHeight = 150;
@@ -228,6 +250,16 @@ export default class MobileMap extends Component {
       )
     }
 
+    if(overlayContent) {
+      var overlay = (
+        <OverlayContent
+          width= {width}
+          content= {overlayContent}
+          closeOverlay= {closeOverlay}
+        />
+      )
+    }
+
     return (
       <div style= {styleContainer}>
         <Chart
@@ -240,7 +272,7 @@ export default class MobileMap extends Component {
           <Vector
             tiles= {tiles}
           >
-            {children}
+            {this.props.children}
           </Vector>
         </Chart>
         <MercatorController
@@ -264,6 +296,7 @@ export default class MobileMap extends Component {
           {this.props.children}
         </MercatorController>
         {btnGroup}
+        {overlay}
       </div>
     )
 

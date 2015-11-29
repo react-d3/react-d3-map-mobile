@@ -12,13 +12,28 @@ import {
 
 export default class MeshGroup extends Component {
 
+  static contextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired,
+    closeOverlay: React.PropTypes.func.isRequired
+  }
+
   render() {
     const {
       data,
-      geoPath,
       onClick,
-      meshClass
+      onMouseOver,
+      onMouseOut,
+      meshClass,
+      overlayContent
     } = this.props;
+
+    const {
+      geoPath,
+      showOverlay,
+      closeOverlay
+    } = this.context;
 
     var meshs;
 
@@ -35,30 +50,37 @@ export default class MeshGroup extends Component {
       lineData = data;
     }
 
-    if(lineData) {
-      if(Array.isArray(lineData)) {
-        meshs = lineData.map((d, i) => {
-          return (
-            <Mesh
-              id= {'react-d3-map__mesh' + i}
-              key= {'react-d3-map__mesh' + i}
-              data= {d}
-              geoPath= {geoPath}
-              onClick= {onClick}
-              meshClass= {meshClass}
-            />
-          )
-        })
-      }else {
-        meshs = (<Mesh
-          id= {'react-d3-map__mesh'}
-          data= {lineData}
-          geoPath= {geoPath}
-          onClick= {onClick}
-          meshClass= {meshClass}
-        />)
+    if(overlayContent) {
+      // if have overlay content, click to show overlay
+      var onLineClick = (dom, d, i) => {
+        showOverlay(dom, d, overlayContent, i);
+        if(onClick) onClick(dom, d, i);
       }
+    }else {
+      var onLineClick = onClick;
     }
+
+    if(lineData) {
+      // if not array, make it as array
+      if(!Array.isArray(lineData))
+        lineData = [lineData];
+
+      meshs = lineData.map((d, i) => {
+        return (
+          <Mesh
+            id= {'react-d3-map__mesh' + i}
+            key= {'react-d3-map__mesh' + i}
+            data= {d}
+            geoPath= {geoPath}
+            onClick= {onLineClick}
+            onMouseOver= {onMouseOver}
+            onMouseOut= {onMouseOut}
+            meshClass= {meshClass}
+          />
+        )
+      })
+    }
+
 
     return (
       <g>

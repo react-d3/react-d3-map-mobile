@@ -11,13 +11,24 @@ import {
 } from 'react-d3-map-core';
 
 export default class PolygonGroup extends Component {
+
+  static contextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired
+  }
+
   render() {
     const {
       data,
-      geoPath,
       onClick,
+      onMouseOver,
+      onMouseOut,
       polygonClass
     } = this.props;
+
+    const {
+      geoPath
+    } = this.context;
 
     var polygons;
 
@@ -35,28 +46,24 @@ export default class PolygonGroup extends Component {
     }
 
     if(polygonData) {
-      if(Array.isArray(polygonData)) {
-        polygons = polygonData.map((d, i) => {
-          return (
-            <Polygon
-              id= {'react-d3-map__polygon' + i}
-              key= {'react-d3-map__polygon' + i}
-              data= {d}
-              geoPath= {geoPath}
-              onClick= {onClick}
-              polygonClass= {polygonClass}
-            />
-          )
-        })
-      }else {
-        polygons = (<Polygon
-          id= {'react-d3-map__polygon'}
-          data= {polygonData}
-          geoPath= {geoPath}
-          onClick= {onClick}
-          polygonClass= {polygonClass}
-        />)
-      }
+      // if not array, make it as array
+      if(!Array.isArray(polygonData))
+        polygonData = [polygonData];
+
+      polygons = polygonData.map((d, i) => {
+        return (
+          <Polygon
+            id= {'react-d3-map__polygon' + i}
+            key= {'react-d3-map__polygon' + i}
+            data= {d}
+            geoPath= {geoPath}
+            onClick= {onClick}
+            onMouseOver= {onMouseOver}
+            onMouseOut= {onMouseOut}
+            polygonClass= {polygonClass}
+          />
+        )
+      })
     }
 
     return (

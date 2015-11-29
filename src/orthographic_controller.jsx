@@ -109,7 +109,7 @@ export default class OrthographicController extends Component {
       translate: translate,
       rotate: globalRotate,
       simplify: true,
-      simplifyArea: 4,
+      simplifyArea: 30,
       clip: true,
       clipAngle: 90,
       bounds: [[0, 0], [cWidth, cHeight]]

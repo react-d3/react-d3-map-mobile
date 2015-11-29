@@ -12,13 +12,24 @@ import {
 
 export default class MarkerGroup extends Component {
 
+  static contextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired
+  }
+
   render() {
     const {
       data,
-      projection,
       onClick,
+      onMouseOut,
+      onMouseOver,
       markerClass
     } = this.props;
+
+    const {
+      projection,
+      geoPath
+    } = this.context;
 
     var markers;
 
@@ -36,36 +47,28 @@ export default class MarkerGroup extends Component {
     }
 
     if(pointData) {
-      if(Array.isArray(pointData)) {
-        markers = pointData.map((d, i) => {
-          var x = +projection(d.geometry.coordinates)[0];
-          var y = +projection(d.geometry.coordinates)[1];
-          var id = x + '-' + y;
-          return (
-            <Marker
-              id= {id}
-              key= {i}
-              data= {d}
-              x= {x}
-              y= {y}
-              onClick= {onClick}
-              markerClass= {markerClass}
-            />
-          )
-        })
-      }else {
+      // if not array, make it as array
+      if(!Array.isArray(pointData))
+        pointData = [pointData];
+
+      markers = pointData.map((d, i) => {
         var x = +projection(d.geometry.coordinates)[0];
         var y = +projection(d.geometry.coordinates)[1];
         var id = x + '-' + y;
-        markers = (<Marker
-          id= {id}
-          data= {pointData}
-          x= {x}
-          y= {y}
-          onClick= {onClick}
-          markerClass= {markerClass}
-        />)
-      }
+        return (
+          <Marker
+            id= {id}
+            key= {i}
+            data= {d}
+            x= {x}
+            y= {y}
+            onClick= {onClick}
+            onMouseOver= {onMouseOver}
+            onMouseOut= {onMouseOut}
+            markerClass= {markerClass}
+          />
+        )
+      })
     }
 
     return (
