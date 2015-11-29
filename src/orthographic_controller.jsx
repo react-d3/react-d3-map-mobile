@@ -60,20 +60,21 @@ export default class OrthographicController extends Component {
       })
       .on("drag", function(d,i) {
         var proj = that.proj;
-        var centerPx = proj(controllerCenter)
-        var newPosition = that.extentPosition
 
         var evt = d3.event;
         var rotate = proj.rotate();
 
-        newPosition[0] += evt.dx * sens;
-        newPosition[1] += evt.dy * sens;
+        var λ = evt.x * sens;
+        var φ = -evt.y * sens;
 
-        var pos = proj.invert([centerPx[0] - newPosition[0], centerPx[1] - newPosition[1]])
+        // avoid updside-down
+        φ = φ > 30 ? 30 : φ < -30 ? -30 : φ;
+
+        var pos = proj.invert([cWidth / 2, cHeight / 2])
         // sent the center coordinates to the map
         dragExtent(pos, [
-          evt.x * sens,
-          -evt.y * sens,
+          λ,
+          φ,
           rotate[2]
         ])
       })
