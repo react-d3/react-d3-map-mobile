@@ -30,13 +30,15 @@ export default class OrthographicController extends Component {
 
   static childContextTypes = {
     geoPath: React.PropTypes.func.isRequired,
-    projection: React.PropTypes.func.isRequired
+    projection: React.PropTypes.func.isRequired,
+    controller: React.PropTypes.bool
   }
 
   getChildContext() {
     return {
       geoPath: this.geoPath,
-      projection: this.proj
+      projection: this.proj,
+      controller: true
     };
   }
 
@@ -131,17 +133,6 @@ export default class OrthographicController extends Component {
 
     this.proj = proj;
     this.geoPath = geo;
-
-    // add projection and geoPath to children
-    var children = React.Children.map(
-      this.props.children,
-      (child) => {
-        return React.cloneElement(child, {
-          projection: proj,
-          geoPath: geo
-        })
-      }
-    );
 
     var containerStyle = {
       left: 0,

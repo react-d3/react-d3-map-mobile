@@ -30,6 +30,7 @@ export default class MarkerGroup extends Component {
       onMouseOut,
       onMouseOver,
       markerClass,
+      pointClass,
       overlayContent
     } = this.props;
 
@@ -96,7 +97,7 @@ export default class MarkerGroup extends Component {
       var markers = (
         <PointGroup
           data= {data}
-          pointClass= {markerClass}
+          pointClass= {pointClass}
         />
       )
     }

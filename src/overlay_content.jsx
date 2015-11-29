@@ -23,24 +23,25 @@ export default class OverlayContent extends Component {
       top: 0,
       position: 'absolute',
       width: width,
-      padding: '10px',
       backgroundColor: '#FFF',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      font: '16px/14px Tahoma, Verdana, sans-serif',
     }
 
     var leftContentStyle = {
       width: width - 50,
       float: 'left',
+      padding: '10px',
       overflowY: 'auto',
       maxHeight: '150px',
       fontSize: '20px'
     }
 
     var rightCloseStyle = {
-      width: 50,
+      width: 30,
       float: 'right',
       fontWeight: 'bolder',
-      color: '#333',
+      color: '#c3c3c3',
       fontSize: '25px',
       cursor: 'pointer'
     }

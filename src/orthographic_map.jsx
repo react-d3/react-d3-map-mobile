@@ -22,6 +22,10 @@ import {
 } from './orthographic_controller'
 
 import {
+  default as OverlayContent
+} from './overlay_content'
+
+import {
   default as ZoomControl
 } from './zoom'
 
@@ -44,7 +48,8 @@ export default class OrthographicMobileMap extends Component {
       center: center,
       refresh: false,
       dragStart: false,
-      globalRotate: [-center[0], -center[1]]
+      globalRotate: [-center[0], -center[1]],
+      overlayContent: null
     }
   }
 
@@ -55,13 +60,17 @@ export default class OrthographicMobileMap extends Component {
 
   static childContextTypes = {
     geoPath: React.PropTypes.func.isRequired,
-    projection: React.PropTypes.func.isRequired
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired,
+    controller: React.PropTypes.bool.isRequired
   }
 
   getChildContext() {
     return {
       geoPath: this.geoPath,
-      projection: this.projection
+      projection: this.projection,
+      showOverlay: this.showOverlay.bind(this),
+      controller: false
     };
   }
 
@@ -126,8 +135,16 @@ export default class OrthographicMobileMap extends Component {
     })
   }
 
-  onClickData() {
-    console.log('click')
+  showOverlay(dom, d, overlayContent, i) {
+    this.setState({
+      overlayContent: overlayContent(d)
+    })
+  }
+
+  closeOverlay() {
+    this.setState({
+      overlayContent: null
+    })
   }
 
   render() {
@@ -137,22 +154,22 @@ export default class OrthographicMobileMap extends Component {
       center,
       refresh,
       dragStart,
-      globalRotate
+      globalRotate,
+      overlayContent
     } = this.state;
 
     const {
       width,
       height,
       projection,
-      controllerScale,
-      tabMode
+      controllerScale
     } = this.props;
 
     var zoomIn = this.zoomIn.bind(this);
     var zoomOut = this.zoomOut.bind(this);
     var refreshEvt = this.refreshEvt.bind(this);
-    var onClickData = this.onClickData.bind(this);
     var dragExtent = this.dragExtent.bind(this);
+    var closeOverlay = this.closeOverlay.bind(this);
 
     var proj = projectionFunc({
       projection: projection,
@@ -193,22 +210,22 @@ export default class OrthographicMobileMap extends Component {
     mapDim.bottomLine.push(proj.invert([width, height]))
     mapDim.bottomLine.push(proj.invert([0, height]))
 
-    if(!tabMode) {
-      var btnGroup = (
-        <ZoomControl
-          top= {height}
-          left= {width}
-          zoomInClick= {zoomIn}
-          zoomOutClick= {zoomOut}
-          refreshClick= {refreshEvt}
-        />
-      )
-    }else {
-      var btnGroup = (
-        <ZoomTabControl
-          top= {height}
-          left= {width}
-          refreshClick= {refreshEvt}
+    var btnGroup = (
+      <ZoomControl
+        top= {height}
+        left= {width}
+        zoomInClick= {zoomIn}
+        zoomOutClick= {zoomOut}
+        refreshClick= {refreshEvt}
+      />
+    )
+
+    if(overlayContent) {
+      var overlay = (
+        <OverlayContent
+          width= {width}
+          content= {overlayContent}
+          closeOverlay= {closeOverlay}
         />
       )
     }
@@ -246,6 +263,7 @@ export default class OrthographicMobileMap extends Component {
           {this.props.children}
         </OrthographicController>
         {btnGroup}
+        {overlay}
       </div>
     )
 
