@@ -24,6 +24,11 @@ import {
   default as PointGroup
 } from './components/point_group'
 
+import {
+  default as MarkerGroup
+} from './components/marker_group'
+
 export {LineGroup}
 export {PolygonGroup}
 export {PointGroup}
+export {MarkerGroup}

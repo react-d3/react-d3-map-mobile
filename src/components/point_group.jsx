@@ -14,7 +14,8 @@ export default class PointGroup extends Component {
 
   static contextTypes = {
     geoPath: React.PropTypes.func.isRequired,
-    projection: React.PropTypes.func.isRequired
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired
   }
 
   render() {
@@ -23,11 +24,14 @@ export default class PointGroup extends Component {
       onClick,
       onMouseOut,
       onMouseOver,
-      pointClass
+      pointClass,
+      overlayContent
     } = this.props;
 
     const {
-      geoPath
+      geoPath,
+      projection,
+      showOverlay
     } = this.context;
 
     var points;
@@ -45,6 +49,16 @@ export default class PointGroup extends Component {
       pointData = data;
     }
 
+    if(overlayContent) {
+      // if have overlay content, click to show overlay
+      var onPointClick = (dom, d, i) => {
+        showOverlay(dom, d, overlayContent, i);
+        if(onClick) onClick(dom, d, i);
+      }
+    }else {
+      var onPointClick = onClick;
+    }
+
     if(pointData) {
       // if not array, make it as array
       if(!Array.isArray(pointData))
@@ -59,9 +73,10 @@ export default class PointGroup extends Component {
             id= {id}
             key= {i}
             data= {d}
+            geoPath= {geoPath}
             x= {x}
             y= {y}
-            onClick= {onClick}
+            onClick= {onPointClick}
             onMouseOver= {onMouseOver}
             onMouseOut= {onMouseOut}
             pointClass= {pointClass}

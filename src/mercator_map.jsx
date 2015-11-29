@@ -64,7 +64,7 @@ export default class MobileMap extends Component {
     geoPath: React.PropTypes.func.isRequired,
     projection: React.PropTypes.func.isRequired,
     showOverlay: React.PropTypes.func.isRequired,
-    closeOverlay: React.PropTypes.func.isRequired
+    controller: React.PropTypes.bool.isRequired
   }
 
   getChildContext() {
@@ -72,7 +72,7 @@ export default class MobileMap extends Component {
       geoPath: this.geoPath,
       projection: this.projection,
       showOverlay: this.showOverlay.bind(this),
-      closeOverlay: this.closeOverlay.bind(this)
+      controller: false
     };
   }
 

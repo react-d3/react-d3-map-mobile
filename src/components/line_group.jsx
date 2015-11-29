@@ -15,8 +15,7 @@ export default class MeshGroup extends Component {
   static contextTypes = {
     geoPath: React.PropTypes.func.isRequired,
     projection: React.PropTypes.func.isRequired,
-    showOverlay: React.PropTypes.func.isRequired,
-    closeOverlay: React.PropTypes.func.isRequired
+    showOverlay: React.PropTypes.func.isRequired
   }
 
   render() {
@@ -31,8 +30,7 @@ export default class MeshGroup extends Component {
 
     const {
       geoPath,
-      showOverlay,
-      closeOverlay
+      showOverlay
     } = this.context;
 
     var meshs;

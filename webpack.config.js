@@ -17,7 +17,8 @@ module.exports = [{
     container: './example/src/container.jsx',
     global: './example/src/global.jsx',
     multipolygon: './example/src/multipolygon.jsx',
-    line: './example/src/line.jsx'
+    line: './example/src/line.jsx',
+    point: './example/src/point.jsx'
   },
 
   output: {

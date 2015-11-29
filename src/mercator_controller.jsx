@@ -65,6 +65,25 @@ export default class MercatorController extends Component {
     }
   }
 
+  static childContextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired,
+    controller: React.PropTypes.bool
+  }
+
+  getChildContext() {
+    const {
+      proj,
+      geo
+    } = this.state;
+
+    return {
+      geoPath: geo,
+      projection: proj,
+      controller: true
+    };
+  }
+
   componentDidUpdate() {
     const {refresh} = this.props
 
@@ -148,17 +167,6 @@ export default class MercatorController extends Component {
       controllerTiles
     } = this.state;
 
-    // add projection and geoPath to children
-    var children = React.Children.map(
-      this.props.children,
-      (child) => {
-        return React.cloneElement(child, {
-          projection: proj,
-          geoPath: geo
-        })
-      }
-    );
-
     var containerStyle = {
       left: 0,
       bottom: 0,
@@ -237,7 +245,7 @@ export default class MercatorController extends Component {
               tiles= {controllerTiles}
               scale= {scale}
             >
-              {children}
+              {this.props.children}
             </MercatorControllerMap>
             <g
               ref= {"extent"}

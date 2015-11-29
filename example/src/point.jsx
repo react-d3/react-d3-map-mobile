@@ -5,7 +5,8 @@ var ReactDOM = require('react-dom');
 var topojson = require('topojson');
 
 var MercatorMobileMap = require('../../lib/index').MercatorMobileMap;
-var PolygonGroup = require('../../lib/index').PolygonGroup;
+var PointGroup = require('../../lib/index').PointGroup;
+var MarkerGroup = require('../../lib/index').MarkerGroup;
 
 var css= require('./css/polygon.css');
 
@@ -13,11 +14,12 @@ var css= require('./css/polygon.css');
 (function() {
   var width = window.innerWidth > 736? 736 : window.innerWidth;
   var height = window.innerHeight > 736? 736 : window.innerHeight;
-  var scale = (1 << 12);
+  var scale = 1200 * 5;
   var controllerScale = (1 << 8);
-  var center = [-100.95, 40.7];
-  var data = require('json!../data/states.json');
-  var content = function(d) { return 'hello I am polygon'; }
+  var center = [-5, 55.4];
+  var uk = require('json!../data/uk.json');
+  var data = topojson.feature(uk, uk.objects.places);
+  var content = function(d) { return d.properties.name; }
 
   ReactDOM.render(
     <MercatorMobileMap
@@ -27,13 +29,13 @@ var css= require('./css/polygon.css');
       controllerScale= {controllerScale}
       center= {center}
     >
-      <PolygonGroup
+      <MarkerGroup
         data= {data}
         overlayContent= {content}
-        polygonClass= {'react-d3-map-mobile__mercator_controller__polygon_group'}
+        markerClass= {'react-d3-map-mobile__mercator_controller__marker_group'}
       />
     </MercatorMobileMap>
-  , document.getElementById('blank-multipolygon')
+  , document.getElementById('blank-point')
   )
 
 })()

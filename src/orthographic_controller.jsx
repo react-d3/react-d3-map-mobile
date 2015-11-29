@@ -28,6 +28,18 @@ export default class OrthographicController extends Component {
     sens: .25
   }
 
+  static childContextTypes = {
+    geoPath: React.PropTypes.func.isRequired,
+    projection: React.PropTypes.func.isRequired
+  }
+
+  getChildContext() {
+    return {
+      geoPath: this.geoPath,
+      projection: this.proj
+    };
+  }
+
   componentDidUpdate() {
     const {refresh} = this.props
 
@@ -68,7 +80,7 @@ export default class OrthographicController extends Component {
         var φ = -evt.y * sens;
 
         // avoid updside-down
-        φ = φ > 30 ? 30 : φ < -30 ? -30 : φ;
+        φ = φ > 90 ? 90 : φ < -90 ? -90 : φ;
 
         var pos = proj.invert([cWidth / 2, cHeight / 2])
         // sent the center coordinates to the map
@@ -118,6 +130,7 @@ export default class OrthographicController extends Component {
     var geo = geoPath(proj);
 
     this.proj = proj;
+    this.geoPath = geo;
 
     // add projection and geoPath to children
     var children = React.Children.map(
@@ -170,7 +183,7 @@ export default class OrthographicController extends Component {
               projection= {proj}
               geoPath= {geo}
             >
-              {children}
+              {this.props.children}
             </OrthographicControllerMap>
             <Polygon
               data= {extentRect}

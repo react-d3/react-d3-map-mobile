@@ -10,11 +10,17 @@ import {
   Marker
 } from 'react-d3-map-core';
 
+import {
+  default as PointGroup
+} from './point_group';
+
 export default class MarkerGroup extends Component {
 
   static contextTypes = {
     geoPath: React.PropTypes.func.isRequired,
-    projection: React.PropTypes.func.isRequired
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired,
+    controller: React.PropTypes.bool.isRequired
   }
 
   render() {
@@ -23,52 +29,76 @@ export default class MarkerGroup extends Component {
       onClick,
       onMouseOut,
       onMouseOver,
-      markerClass
+      markerClass,
+      overlayContent
     } = this.props;
 
     const {
       projection,
-      geoPath
+      geoPath,
+      showOverlay,
+      controller
     } = this.context;
 
     var markers;
 
-    if(data.type === 'FeatureCollection') {
-      var pointData = [];
-
-      // loop through features
-      data.features.forEach(function(d) {
-        pointData.push(d);
-      })
-    }else if(data.type === 'Feature') {
-      var pointData;
-
-      pointData = data;
+    if(overlayContent) {
+      // if have overlay content, click to show overlay
+      var onMarkerClick = (dom, d, i) => {
+        showOverlay(dom, d, overlayContent, i);
+        if(onClick) onClick(dom, d, i);
+      }
+    }else {
+      var onMarkerClick = onClick;
     }
 
-    if(pointData) {
-      // if not array, make it as array
-      if(!Array.isArray(pointData))
-        pointData = [pointData];
+    if(!controller) {
 
-      markers = pointData.map((d, i) => {
-        var x = +projection(d.geometry.coordinates)[0];
-        var y = +projection(d.geometry.coordinates)[1];
-        var id = x + '-' + y;
-        return (
-          <Marker
-            id= {id}
-            key= {i}
-            data= {d}
-            x= {x}
-            y= {y}
-            onClick= {onClick}
-            onMouseOver= {onMouseOver}
-            onMouseOut= {onMouseOut}
-            markerClass= {markerClass}
-          />
-        )
-      })
+      if(data.type === 'FeatureCollection') {
+        var pointData = [];
+
+        // loop through features
+        data.features.forEach(function(d) {
+          pointData.push(d);
+        })
+      }else if(data.type === 'Feature') {
+        var pointData;
+
+        pointData = data;
+      }
+
+      if(pointData) {
+        // if not array, make it as array
+        if(!Array.isArray(pointData))
+          pointData = [pointData];
+
+        markers = pointData.map((d, i) => {
+          var x = +projection(d.geometry.coordinates)[0];
+          var y = +projection(d.geometry.coordinates)[1];
+          var id = x + '-' + y;
+          return (
+            <Marker
+              id= {id}
+              key= {i}
+              data= {d}
+              x= {x}
+              y= {y}
+              onClick= {onMarkerClick}
+              onMouseOver= {onMouseOver}
+              onMouseOut= {onMouseOut}
+              markerClass= {markerClass}
+            />
+          )
+        })
+      }
+    }else {
+      // change to point group, if it is in controller.
+      var markers = (
+        <PointGroup
+          data= {data}
+          pointClass= {markerClass}
+        />
+      )
     }
 
     return (

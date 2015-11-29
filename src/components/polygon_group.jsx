@@ -14,7 +14,8 @@ export default class PolygonGroup extends Component {
 
   static contextTypes = {
     geoPath: React.PropTypes.func.isRequired,
-    projection: React.PropTypes.func.isRequired
+    projection: React.PropTypes.func.isRequired,
+    showOverlay: React.PropTypes.func.isRequired
   }
 
   render() {
@@ -23,11 +24,13 @@ export default class PolygonGroup extends Component {
       onClick,
       onMouseOver,
       onMouseOut,
-      polygonClass
+      polygonClass,
+      overlayContent
     } = this.props;
 
     const {
-      geoPath
+      geoPath,
+      showOverlay
     } = this.context;
 
     var polygons;
@@ -45,6 +48,16 @@ export default class PolygonGroup extends Component {
       polygonData = data;
     }
 
+    if(overlayContent) {
+      // if have overlay content, click to show overlay
+      var onPolygonClick = (dom, d, i) => {
+        showOverlay(dom, d, overlayContent, i);
+        if(onClick) onClick(dom, d, i);
+      }
+    }else {
+      var onPolygonClick = onClick;
+    }
+
     if(polygonData) {
       // if not array, make it as array
       if(!Array.isArray(polygonData))
@@ -57,7 +70,7 @@ export default class PolygonGroup extends Component {
             key= {'react-d3-map__polygon' + i}
             data= {d}
             geoPath= {geoPath}
-            onClick= {onClick}
+            onClick= {onPolygonClick}
             onMouseOver= {onMouseOver}
             onMouseOut= {onMouseOut}
             polygonClass= {polygonClass}
