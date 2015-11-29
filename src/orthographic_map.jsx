@@ -106,7 +106,6 @@ export default class OrthographicMobileMap extends Component {
   }
 
   dragExtent(center, rotate) {
-
     this.setState({
       center: center,
       globalRotate: rotate,
