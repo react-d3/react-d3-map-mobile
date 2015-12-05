@@ -7,12 +7,6 @@ var css = require('../react-d3-map-mobile.css')
 export {MercatorMobileMap}
 
 import {
-  default as OrthographicMobileMap
-} from './orthographic_map'
-
-export {OrthographicMobileMap}
-
-import {
   default as LineGroup
 } from './components/line_group'
 
