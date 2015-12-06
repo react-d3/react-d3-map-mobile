@@ -9,6 +9,8 @@ var PointGroup = require('../../lib/index').PointGroup;
 var MarkerGroup = require('../../lib/index').MarkerGroup;
 
 var css= require('./css/polygon.css');
+var mobile_css = require('../../react-d3-map-mobile.css');
+
 
 // Example
 (function() {

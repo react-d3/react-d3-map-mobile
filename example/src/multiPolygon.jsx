@@ -8,6 +8,8 @@ var MercatorMobileMap = require('../../lib/index').MercatorMobileMap;
 var PolygonGroup = require('../../lib/index').PolygonGroup;
 
 var css= require('./css/polygon.css');
+var mobile_css = require('../../react-d3-map-mobile.css');
+
 
 // Example
 (function() {
