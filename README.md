@@ -21,8 +21,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var topojson = require('topojson');
 
-var MercatorMobileMap = require('../../lib/index').MercatorMobileMap;
-var PolygonGroup = require('../../lib/index').PolygonGroup;
+var MercatorMobileMap = require('react-d3-map-mobile').MercatorMobileMap;
+var PolygonGroup = require('react-d3-map-mobile').PolygonGroup;
 
 var css= require('./css/polygon.css');
 
@@ -67,8 +67,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var topojson = require('topojson');
 
-var MercatorMobileMap = require('../../lib/index').MercatorMobileMap;
-var LineGroup = require('../../lib/index').LineGroup;
+var MercatorMobileMap = require('react-d3-map-mobile').MercatorMobileMap;
+var LineGroup = require('react-d3-map-mobile').LineGroup;
 
 var css= require('./css/polygon.css');
 
@@ -144,9 +144,9 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var topojson = require('topojson');
 
-var MercatorMobileMap = require('../../lib/index').MercatorMobileMap;
-var PointGroup = require('../../lib/index').PointGroup;
-var MarkerGroup = require('../../lib/index').MarkerGroup;
+var MercatorMobileMap = require('react-d3-map-mobile').MercatorMobileMap;
+var PointGroup = require('react-d3-map-mobile').PointGroup;
+var MarkerGroup = require('react-d3-map-mobile').MarkerGroup;
 
 var css= require('./css/polygon.css');
 
