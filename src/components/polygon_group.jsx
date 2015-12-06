@@ -18,6 +18,10 @@ export default class PolygonGroup extends Component {
     showOverlay: React.PropTypes.func.isRequired
   }
 
+  static defaultProps = {
+    polygonClass: 'react-d3-map-mobile__mercator_controller__polygon_group'
+  }
+
   render() {
     const {
       data,

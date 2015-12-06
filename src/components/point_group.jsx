@@ -18,6 +18,10 @@ export default class PointGroup extends Component {
     showOverlay: React.PropTypes.func.isRequired
   }
 
+  static defaultProps = {
+    pointClass: '.react-d3-map-mobile__mercator_controller__point_group'
+  }
+
   render() {
     const {
       data,

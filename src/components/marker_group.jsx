@@ -23,6 +23,10 @@ export default class MarkerGroup extends Component {
     controller: React.PropTypes.bool.isRequired
   }
 
+  static defaultProps = {
+    markerClass: 'react-d3-map-mobile__mercator_controller__marker_group'
+  }
+
   render() {
     const {
       data,

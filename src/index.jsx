@@ -2,8 +2,6 @@ import {
   default as MercatorMobileMap
 } from './mercator_map'
 
-var css = require('../react-d3-map-mobile.css')
-
 export {MercatorMobileMap}
 
 import {

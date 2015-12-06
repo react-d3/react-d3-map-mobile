@@ -18,6 +18,10 @@ export default class MeshGroup extends Component {
     showOverlay: React.PropTypes.func.isRequired
   }
 
+  static defaultProps = {
+    meshClass: 'react-d3-map-mobile__mercator_controller__line_group'
+  }
+
   render() {
     const {
       data,
