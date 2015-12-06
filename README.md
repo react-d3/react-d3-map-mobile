@@ -181,6 +181,10 @@ var css= require('./css/polygon.css');
 
 ```
 
+### Styles
+
+You will have to clone `react-d3-map-mobile.css` and include in your html for default styles.
+
 ## License
 
 Apache 2.0
